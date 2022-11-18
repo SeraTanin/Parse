@@ -17,7 +17,8 @@ def get_html(url, params=None):
 
 
 def get_pages_count(html):
-    soup = BeautifulSoup(html, 'lxml')
+    r = requests.get(url, headers=headers)
+    soup = BeautifulSoup(r.text, features='html.parser')
     pagination = soup.find_all('a', class_='button')
 
     return pagination
