@@ -24,7 +24,6 @@ def page_num():
 
 
 for url in urls:
-    page_num()
     r = requests.get(url, headers=headers)
     soup = Bp(r.text, features='html.parser')
 
