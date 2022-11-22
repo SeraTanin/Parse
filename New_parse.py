@@ -17,13 +17,14 @@ for page in pages:
     urls.append(url_link + page)
 # print(urls)
 
-def page_num():
-    for num_count in range(1, 6):
+# def page_num():
+#     for num_count in range(1, 6):
+#         return f"Pasrsing page № {num_count}"
 
-        print(num_count)
-
-
+page_list = 0
 for url in urls:
+    page_list += 1
+    print(f"Parsing page # {page_list}")
     r = requests.get(url, headers=headers)
     soup = Bp(r.text, features='html.parser')
 
