@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup as Bp
+from datetime import time
+import csv
 import sys
 import os
 
@@ -12,35 +14,45 @@ HOST = 'http://www.guitar.by/forum'
 FILE = 'pedals.csv'
 
 
-urls = [url_link]
-for page in pages:
-    urls.append(url_link + page)
-# print(urls)
 
-# def page_num():
-#     for num_count in range(1, 6):
-#         return f"Pasrsing page № {num_count}"
+def get_pages():
+    for page in pages:
+        urls.append(url_link + page)
+    return urls
 
-page_list = 0
-for url in urls:
-    page_list += 1
-    print(f"Parsing page # {page_list}")
-    r = requests.get(url, headers=headers)
-    soup = Bp(r.text, features='html.parser')
 
-    items = soup.find_all('a', class_="topictitle")
+def get_list_of_pedals():
+    page_list = 1
+    for url in urls:
 
+
+        print(f"Parsing page # {page_list}...\n")
+        r = requests.get(url, headers=headers)
+        soup = Bp(r.text, features='html.parser')
+        items = soup.find_all('a', class_="topictitle")
+
+        for item in items:
+            if 'boss' in item.get_text(strip=True).lower():
+                pedals.append({
+                    'title': item.get_text(strip=True),
+                    'link': HOST + item.get('href').lstrip('.')
+                })
+
+                print(f"{item.get_text(strip=True), HOST + item.get('href').lstrip('.')}\n")
+        page_list += 1
+
+
+def write_to_csv_file(items, path):
+    with open(path, 'a', encoding='utf-8') as file:
+        writer = csv.writer(file, delimiter=' ')
+        writer.writerow(['Название', 'Ссылка'])
+        for item in items:
+            writer.writerow([item['title'], item['link']])
+
+
+if __name__ == '__main__':
     pedals = []
-    for item in items:
-        pedals.append({
-            'title': item.get_text(strip=True),
-            'link': HOST + item.get('href').lstrip('.')
-        })
-    for i in pedals:
-        boss_pedals = []
-        i = str(i)
-        low_reg = i.lower()
-
-        if 'boss' in low_reg:
-            boss_pedals.append(low_reg)
-            print(boss_pedals)
+    urls = [url_link]
+    get_pages()
+    get_list_of_pedals()
+    write_to_csv_file('items', 'boss_pedals.csv')

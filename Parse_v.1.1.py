@@ -24,22 +24,26 @@ def get_html(url=url_parse):
     return pedals
 
 
-def get_next_page():
-    r = requests.get(url=url_parse)
-    soup = BeautifulSoup(r.text, features='html.parser')
-    num_active_page = soup.find('li', class_='active').find_next().get_text()
-    active_page = soup.find('li', class_='active').find_next()
+def get_pages():
+    while True:
+        urls = [url_parse]
+        for url in urls:
+            r = requests.get(url=url_parse)
+            soup = BeautifulSoup(r.text, features='html.parser')
+            num_active_page = soup.find('li', class_='active').find_next().get_text()
+            active_page = soup.find('li', class_='active').find_next()
 
-    link_to_next_page = HOST + active_page.find_next('a', class_='button').get('href')[1:]
-    num_active_page = int(num_active_page)
-    # full_link_to_next_page = HOST + link_to_next_page[1:]
-    # next_page = HOST + link_to_next_page
-    return num_active_page, link_to_next_page
+            link_to_next_page = HOST + active_page.find_next('a', class_='button').get('href')[1:]
+            urls.append(link_to_next_page)
+            # full_link_to_next_page = HOST + link_to_next_page[1:]
+            # next_page = HOST + link_to_next_page
+            if len(urls) > 5:
+                break
+        return urls
 
 
 def change_pages():
     pass
 
 if __name__ == '__main__':
-    # print(get_html())
-    print(get_next_page())
+    print(get_pages())
